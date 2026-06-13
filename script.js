@@ -1,36 +1,32 @@
-// Add a simple scroll effect to navbar
-const navbar = document.querySelector('.navbar');
+const themeToggleBtn = document.getElementById('theme-toggle');
+const themeIcon = themeToggleBtn.querySelector('i');
 
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.style.background = 'rgba(10, 10, 15, 0.95)';
-        navbar.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.5)';
+// Check for saved theme preference or use system preference
+const savedTheme = localStorage.getItem('theme');
+const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+let currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+// Apply the theme on load
+document.documentElement.setAttribute('data-theme', currentTheme);
+updateIcon(currentTheme);
+
+// Toggle theme on button click
+themeToggleBtn.addEventListener('click', () => {
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    localStorage.setItem('theme', currentTheme);
+    
+    updateIcon(currentTheme);
+});
+
+function updateIcon(theme) {
+    if (theme === 'dark') {
+        themeIcon.classList.remove('ph-moon');
+        themeIcon.classList.add('ph-sun');
     } else {
-        navbar.style.background = 'rgba(10, 10, 15, 0.8)';
-        navbar.style.boxShadow = 'none';
+        themeIcon.classList.remove('ph-sun');
+        themeIcon.classList.add('ph-moon');
     }
-});
-
-// Simple intersection observer for fade-in animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: "0px 0px -50px 0px"
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-
-// Initialize elements with fade-in states
-document.querySelectorAll('.feature-card').forEach(card => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
-    card.style.transition = 'all 0.6s ease-out';
-    observer.observe(card);
-});
+}
